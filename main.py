@@ -1,3 +1,5 @@
+import colorsys
+
 import pyodbc
 from turtle import *
 from random import randint
@@ -21,6 +23,9 @@ def get_configs():
             "colour1": row[2],
             "colour2": row[3],
             "colour3": row[4],
+            "colour12": row[6],
+            "colour22": row[7],
+            "colour32": row[8],
             "rand": row[5]
         }
         configs.append(config)
@@ -36,11 +41,14 @@ def turtlefunc():
     colormode(255)
     duration = 10
     angle = randint(48, 360)
-    t.pensize(randint(1, 4))
+    t.pensize(randint(2, 4))
     colour1 = randint(0, 255)
     colour2 = randint(0, 255)
     colour3 = randint(0, 255)
-    rand = randint(0, 15000)
+    colour12 = randint(0, 255)
+    colour22 = randint(0, 255)
+    colour32 = randint(0, 255)
+    rand = 1300
     pencolor(0,0,0)
     j = 0
 
@@ -60,6 +68,9 @@ def turtlefunc():
                 colour1 = config["colour1"]
                 colour2 = config["colour2"]
                 colour3 = config["colour3"]
+                colour12 = config["colour12"]
+                colour22 = config["colour22"]
+                colour32 = config["colour32"]
                 rand = config["rand"]
                 duration = int(input("how long do you want it to go"))
     else:
@@ -69,18 +80,33 @@ def turtlefunc():
 
     t.speed(0)
 
+    start_color = (colour1, colour2, colour3)
+    end_color = (colour12, colour22, colour32)
 
+    gradient_cycles = int(duration/10)  # number of times to repeat the gradient
+    cycle_duration = duration / gradient_cycles  # duration for each cycle
+    start_time = time.time()  # reset the start time for each cycle
 
-    while time.time() - start_time < duration:
-        # Calculate the value of i based on the current time
-        i = int((time.time() - start_time) * 10) + rand
+    for cycle in range(gradient_cycles):
+        cycle_start_time = time.time()  # start time for this cycle
 
+        while time.time() - cycle_start_time < cycle_duration:
+            # Calculate the value of i based on the current time and the cycle duration
+            i = (time.time() - cycle_start_time) / cycle_duration
 
-        j += 1
+            j += 1
 
-        t.forward(j)
-        t.left(angle)
-        t.pencolor(255 - i % colour1, i % colour2, i % colour3)
+            # Interpolate between the start and end colors based on i
+            r = int(start_color[0] * (1 - i) + end_color[0] * i)
+            g = int(start_color[1] * (1 - i) + end_color[1] * i)
+            b = int(start_color[2] * (1 - i) + end_color[2] * i)
+
+            t.forward(j)
+            t.left(angle)
+            t.pencolor(r, g, b)
+
+        # Update the start time for the next cycle
+        start_time += cycle_duration
 
     record_values = input(
         "Do you want to record the values of angle, pensize, colour1, colour2, and colour3 in a database? (y/n) ")
@@ -93,7 +119,7 @@ def turtlefunc():
 
         # Define the table and field names
         table_name = "patterns"
-        field_names = ["angle", "pensize", "colour1", "colour2", "colour3", "rand"]
+        field_names = ["angle", "pensize", "colour1", "colour2", "colour3", "colour12", "colour22", "colour32", "rand"]
 
         # Create the table if it doesn't exist
         try:
@@ -102,7 +128,7 @@ def turtlefunc():
             pass
 
         # Insert the values into the table
-        values = [angle, t.pensize(), colour1, colour2, colour3, rand]
+        values = [angle, t.pensize(), colour1, colour2, colour3,  colour12, colour22, colour32, rand]
         cursor.execute(
             f"INSERT INTO {table_name} ({', '.join(field_names)}) VALUES ({', '.join(['?' for i in range(len(values))])})",
             values)
@@ -122,11 +148,7 @@ def turtlefunc():
 
     screen = Screen()
     screen.bye()
-    t.
 
 if __name__ == '__main__':
-    while True:
-        turtlefunc()
-        choice = input("Do you want to run the program again? (y/n) ")
-        if choice.lower() != "y":
-            break
+    turtlefunc()
+
