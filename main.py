@@ -1,9 +1,11 @@
 import colorsys
+import turtle
 
 import pyodbc
 from turtle import *
 from random import randint
 import time
+
 
 def get_configs():
     # Connect to the Access database
@@ -26,7 +28,8 @@ def get_configs():
             "colour12": row[6],
             "colour22": row[7],
             "colour32": row[8],
-            "rand": row[5]
+            "rand": row[5],
+            "descriptions": row[9]
         }
         configs.append(config)
 
@@ -36,8 +39,13 @@ def get_configs():
 
     return configs
 
+
 def turtlefunc():
     t = Turtle()
+    t.clear()
+    t.penup()
+    t.goto(0, 0)
+    t.pendown()
     colormode(255)
     duration = 10
     angle = randint(48, 360)
@@ -49,7 +57,7 @@ def turtlefunc():
     colour22 = randint(0, 255)
     colour32 = randint(0, 255)
     rand = 1300
-    pencolor(0,0,0)
+    pencolor(0, 0, 0)
     j = 0
 
     configs = get_configs()
@@ -83,35 +91,60 @@ def turtlefunc():
     start_color = (colour1, colour2, colour3)
     end_color = (colour12, colour22, colour32)
 
-    gradient_cycles = int(duration/10)  # number of times to repeat the gradient
-    cycle_duration = duration / gradient_cycles  # duration for each cycle
-    start_time = time.time()  # reset the start time for each cycle
+    rainbowMode = input("Do you want to use rainbow mode? (y/n) ")
 
-    for cycle in range(gradient_cycles):
-        cycle_start_time = time.time()  # start time for this cycle
+    if rainbowMode.lower() == "n":
 
-        while time.time() - cycle_start_time < cycle_duration:
-            # Calculate the value of i based on the current time and the cycle duration
-            i = (time.time() - cycle_start_time) / cycle_duration
+        gradient_cycles = int(duration / 10)  # number of times to repeat the gradient
+        cycle_duration = duration / gradient_cycles  # duration for each cycle
+        start_time = time.time()  # reset the start time for each cycle
+
+        for cycle in range(gradient_cycles):
+            cycle_start_time = time.time()  # start time for this cycle
+
+            while time.time() - cycle_start_time < cycle_duration:
+                # Calculate the value of i based on the current time and the cycle duration
+                i = (time.time() - cycle_start_time) / cycle_duration
+
+                j += 1
+
+                # Interpolate between the start and end colors based on i
+                r = int(start_color[0] * (1 - i) + end_color[0] * i)
+                g = int(start_color[1] * (1 - i) + end_color[1] * i)
+                b = int(start_color[2] * (1 - i) + end_color[2] * i)
+
+                t.forward(j)
+                t.left(angle)
+                t.pencolor(r, g, b)
+
+            # Update the start time for the next cycle
+            start_time += cycle_duration
+        t.hideturtle()
+
+
+    else:
+        print("Rainbow mode activated.")
+        while time.time() - start_time < duration:
+            # Calculate the value of i based on the current time
+            i = (time.time() - start_time) / duration
 
             j += 1
 
-            # Interpolate between the start and end colors based on i
-            r = int(start_color[0] * (1 - i) + end_color[0] * i)
-            g = int(start_color[1] * (1 - i) + end_color[1] * i)
-            b = int(start_color[2] * (1 - i) + end_color[2] * i)
+            # Generate a smooth gradient between the start and end colors
+            r, g, b = [int(x * 255) for x in colorsys.hsv_to_rgb(i, 1, 1)]
 
             t.forward(j)
             t.left(angle)
             t.pencolor(r, g, b)
+        t.hideturtle()
 
-        # Update the start time for the next cycle
-        start_time += cycle_duration
 
     record_values = input(
         "Do you want to record the values of angle, pensize, colour1, colour2, and colour3 in a database? (y/n) ")
 
     if record_values.lower() == "y":
+
+        descriptions = input("Enter a description for the config: ")
         # Connect to the Access database
         conn = pyodbc.connect(
             r"Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=C:\Users\uly\PycharmProjects\turtle\patterns.accdb")
@@ -119,7 +152,7 @@ def turtlefunc():
 
         # Define the table and field names
         table_name = "patterns"
-        field_names = ["angle", "pensize", "colour1", "colour2", "colour3", "colour12", "colour22", "colour32", "rand"]
+        field_names = ["angle", "pensize", "colour1", "colour2", "colour3", "colour12", "colour22", "colour32", "rand", "descriptions"]
 
         # Create the table if it doesn't exist
         try:
@@ -128,7 +161,7 @@ def turtlefunc():
             pass
 
         # Insert the values into the table
-        values = [angle, t.pensize(), colour1, colour2, colour3,  colour12, colour22, colour32, rand]
+        values = [angle, t.pensize(), colour1, colour2, colour3, colour12, colour22, colour32, rand, descriptions]
         cursor.execute(
             f"INSERT INTO {table_name} ({', '.join(field_names)}) VALUES ({', '.join(['?' for i in range(len(values))])})",
             values)
@@ -145,10 +178,8 @@ def turtlefunc():
         print("Values not recorded.")
 
 
-
     screen = Screen()
     screen.bye()
 
 if __name__ == '__main__':
     turtlefunc()
-
