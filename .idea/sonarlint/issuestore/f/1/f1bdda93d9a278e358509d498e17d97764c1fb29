@@ -1,0 +1,5 @@
+
+fpython:S2208"GImport only needed names or import the module and then use its members.(òèÚÜ8ÚƒÔ×1
+zpython:S117%"\Rename this local variable "CustomValue" to match the regular expression ^[_a-z][a-z0-9_]*$.(«–¼¨8ÛƒÔ×1
+zpython:S117#"\Rename this local variable "rainbowMode" to match the regular expression ^[_a-z][a-z0-9_]*$.(ëÅóŸ8ÛƒÔ×1
+Hpython:S1481;")Remove the unused local variable "cycle".(Œâ¬ 8ÛƒÔ×1
