@@ -41,12 +41,8 @@ def turtlefunc():
         duration = int(input("Enter the duration for the turtle (in seconds): "))
         angle = int(input("Enter the angle for the turtle (0-360): "))
         t.pensize(int(input("Enter the pen size for the turtle (1-10): ")))
-        colour1 = int(input("Enter the value for the first colour (0-255): "))
-        colour2 = int(input("Enter the value for the second colour (0-255): "))
-        colour3 = int(input("Enter the value for the third colour (0-255): "))
-        colour12 = int(input("Enter the value for the first colour (0-255): "))
-        colour22 = int(input("Enter the value for the second colour (0-255): "))
-        colour32 = int(input("Enter the value for the third colour (0-255): "))
+        colour1, colour2, colour3 = hex_to_rgb(input("Enter the hex code for the first colour: "))
+        colour12, colour22, colour32 = hex_to_rgb(input("Enter the hex code for the second colour: "))
         start_color = (colour1, colour2, colour3)
         end_color = (colour12, colour22, colour32)
 
@@ -77,6 +73,11 @@ def turtlefunc():
             # Update the start time for the next cycle
             start_time += cycle_duration
         t.hideturtle()
+        Save = input("Do you want to save the image? (y/n) ")
+        if Save.lower() == "y":
+            ts = t.getscreen()
+            ts.getcanvas().postscript(file="turtle_image.eps")
+            print("Image saved as turtle_image.eps")
         turtle.exitonclick()
 
 
@@ -95,10 +96,20 @@ def turtlefunc():
             t.left(angle)
             t.pencolor(r, g, b)
         t.hideturtle()
+        Save = input("Do you want to save the image? (y/n) ")
+        if Save.lower() == "y":
+            ts = t.getscreen()
+            ts.getcanvas().postscript(file="turtle_image.eps")
+            print("Image saved as turtle_image.eps")
         turtle.exitonclick()
 
     screen = Screen()
     screen.bye()
+
+def hex_to_rgb(hex_code):
+    hex_value = hex_code.lstrip('#')
+    rgb = tuple(int(hex_value[i:i+2], 16) for i in (0, 2, 4))
+    return rgb
 
 
 if __name__ == '__main__':

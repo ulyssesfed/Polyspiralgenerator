@@ -5,3 +5,5 @@ S
 main.py,f\1\f1bdda93d9a278e358509d498e17d97764c1fb29
 Å
 Q.idea/sonarlint/securityhotspotstore/f/1/f1bdda93d9a278e358509d498e17d97764c1fb29,b\5\b58a0677868503201074e965423d875803239017
+@
+turtle_image.eps,b\5\b562a593e097f7d8b2457fa322dcdef450d007dd
